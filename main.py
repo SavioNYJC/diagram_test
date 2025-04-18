@@ -66,7 +66,9 @@ def process():
     output_text = resposne.choices[0].text.strip()
 
     return jsonify({
-        "message": output_text,
+            'message': 'Success!',
+            'filename': image.filename,
+            'prompt': prompt
     })
 
 if __name__ == "__main__":
