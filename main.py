@@ -6,6 +6,10 @@ from flask import Flask, render_template, request, jsonify
 client = OpenAI(
     api_key = os.environ['OPENAI_API_KEY']
 )
+
+app = Flask(__name__)
+CORS(app)
+
 def encode_image(image_path):
     with open(image_path, "rb") as image_file:
         return base64.b64encode(image_file.read()).decode("utf-8")
@@ -14,13 +18,16 @@ def encode_image(image_path):
 def index():
     return render_template('index.html')
 
-@app.route('/process', methods=['GET'])
+@app.route('/process', methods=['POST'])
 def process():
     #Gets the relative (subject to change) image path. Include a better system in website in the future. (deprecated)
     #image_path = 'test_chart2.jpeg'
     
     image = request.files['image']
     text_input = request.form['prompt']
+
+    if not image or not prompt:
+        return jsonify({"error": "Missing image or prompt"}), 400
 
     #Encode the image into base64
     base64_image = encode_image(image)
@@ -56,4 +63,6 @@ def process():
 
     output_text = resposne.choices[0].text.strip()
 
-    return render_template('result.html', output = output_text)
+    return jsonify({
+        "message": output_text,
+    })
