@@ -503,42 +503,82 @@ input:focus + .focus-border {
     }
 }
 
-/* Modified typing animation for letter-by-letter and line-by-line effect */
+
+/* Modified typing animation for natural reading flow */
 .typing-animation {
     display: block;
     white-space: normal;
     position: relative;
     line-height: 1.8;
+    overflow: hidden; /* Prevent content jumping */
 }
 
 .typing-animation span {
-    visibility: hidden;
+    opacity: 0;
+    transition: opacity 0.05s ease;
 }
 
 .typing-animation span.visible {
-    visibility: visible;
+    opacity: 1;
 }
 
+/* Improved cursor that follows the text naturally */
 .typing-cursor {
     display: inline-block;
-    width: 3px;
+    width: 2px;
     height: 1.2em;
     background-color: var(--primary);
     margin-left: 2px;
     vertical-align: middle;
     animation: blink-caret 0.75s step-end infinite;
+    position: absolute; /* Allows the cursor to move freely */
+    transition: transform 0.05s ease; /* Smooth movement */
 }
 
 @keyframes blink-caret {
-    from, to { opacity: 0 }
-    50% { opacity: 1 }
+    from, to { opacity: 0.8 }
+    50% { opacity: 0 }
 }
 
-.success {
-    animation: successPulse 1.5s;
+/* Improved spacing in result section to prevent overlapping */
+.result-metadata {
+    margin-bottom: 25px;
+    padding: 16px 20px;
+    background-color: #f3f4f6;
+    border-radius: 8px;
+    font-size: 14px;
+    color: var(--light-text);
+    display: flex;
+    flex-wrap: wrap; /* Allow metadata to wrap on smaller screens */
+    align-items: center;
+    gap: 12px; /* Add gap between metadata items */
 }
 
-/* Text decorative elements */
+.result-content {
+    position: relative;
+    background: linear-gradient(to right, #ffffff, #f9fafb);
+    padding: 40px 30px; /* Increased padding */
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+    border: 1px solid #eef2ff;
+    margin-bottom: 30px; /* Increased margin */
+    overflow: hidden;
+}
+
+/* Add spacing between result sections */
+#result h2 {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--secondary);
+    margin-bottom: 25px; /* Increased from 20px */
+    border-bottom: 2px solid #e5e7eb;
+    padding-bottom: 15px; /* Increased from 10px */
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+/* Ensure decorative elements don't overlap */
 .result-content::before {
     content: '';
     position: absolute;
@@ -548,16 +588,18 @@ input:focus + .focus-border {
     height: 8px;
     background-color: var(--secondary);
     border-radius: 8px 8px 0 0;
+    z-index: 2; /* Ensure it's above other elements */
 }
 
-/* Key points highlight styling */
+/* Fix key points spacing to prevent overlap */
 .key-point {
     background-color: #f0f9ff;
     border-left: 3px solid #3b82f6;
-    padding: 12px 15px;
-    margin: 20px 0;
+    padding: 18px 20px; /* Increased padding */
+    margin: 30px 0; /* Increased margin */
     border-radius: 0 8px 8px 0;
     position: relative;
+    clear: both; /* Prevent floating elements from overlapping */
 }
 
 .key-point::before {
@@ -576,4 +618,5 @@ input:focus + .focus-border {
     justify-content: center;
     font-weight: bold;
     font-size: 14px;
+    z-index: 1; /* Ensure it's visible */
 }

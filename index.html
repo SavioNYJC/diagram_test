@@ -42,7 +42,7 @@
                 <span class="result-label">Image:</span> <span id="resultFileName"></span>
             </div>
             <div class="result-content">
-                <p id="outputText"></p>
+                <div id="outputText"></div>
             </div>
             <div class="result-actions">
                 <button id="copyResults"><i class="fas fa-copy"></i> Copy</button>
@@ -120,10 +120,9 @@
                 
                 // Display the result with animation
                 result.style.display = 'block';
-                outputText.textContent = resultData.response || `Received: ${resultData.message} - ${resultData.prompt}`;
                 result.classList.add('active');
                 result.classList.add('success');
-                animateText(outputText, resultData.response || `Received: ${resultData.message} - ${resultData.prompt}`);
+                animateNaturalReading(resultData.response || `Received: ${resultData.message} - ${resultData.prompt}`, outputText);
                 
                 // Reset form state
                 submitBtn.disabled = false;
@@ -157,7 +156,8 @@
 
         // Copy results functionality
         document.getElementById('copyResults').addEventListener('click', function() {
-            navigator.clipboard.writeText(outputText.textContent);
+            const textContent = outputText.textContent;
+            navigator.clipboard.writeText(textContent);
             this.innerHTML = '<i class="fas fa-check"></i> Copied!';
             setTimeout(() => {
                 this.innerHTML = '<i class="fas fa-copy"></i> Copy';
@@ -183,85 +183,82 @@
         });
     });
 
-    function animateText(element, text, speed = 30) {
-        // Clear the element
-        element.innerHTML = '';
+    // New natural reading flow animation function
+    function animateNaturalReading(text, targetElement) {
+        // Clear previous content and prepare container
+        targetElement.innerHTML = '';
+        targetElement.classList.add('typing-animation');
         
-        // Split text into lines/paragraphs
-        const lines = text.split('\n');
+        // Create a cursor element
+        const cursor = document.createElement('span');
+        cursor.className = 'typing-cursor';
+        targetElement.appendChild(cursor); // Attach to target element
         
-        // Create span elements for each character in each line
-        lines.forEach((line, lineIndex) => {
-            // Create a paragraph element for each line
-            const paragraph = document.createElement('p');
-            paragraph.classList.add('line');
-            
-            // Split into characters and create spans
-            line.split('').forEach(char => {
-                const span = document.createElement('span');
-                span.textContent = char;
-                paragraph.appendChild(span);
-            });
-            
-            // Add paragraph to the element
-            element.appendChild(paragraph);
-            
-            // If not the last line and the line isn't empty, add a line break
-            if (lineIndex < lines.length - 1 && line.trim() !== '') {
-                element.appendChild(document.createElement('br'));
+        // Process text with proper paragraph breaks
+        const paragraphs = text.split('\n').filter(p => p.trim() !== '');
+        let allHTML = '';
+        
+        paragraphs.forEach(paragraph => {
+            if (paragraph.trim() !== '') {
+                allHTML += `<p>${paragraph.split('').map(char => 
+                    `<span>${char}</span>`).join('')}</p>`;
             }
         });
         
-        // Add cursor element
-        const cursor = document.createElement('span');
-        cursor.classList.add('typing-cursor');
-        element.appendChild(cursor);
+        targetElement.innerHTML = allHTML;
+        targetElement.appendChild(cursor);
         
-        // Animation variables
-        let lineIndex = 0;
-        let charIndex = 0;
-        const paragraphs = element.querySelectorAll('.line');
+        const allSpans = targetElement.querySelectorAll('span');
+        let currentIndex = 0;
         
-        // Function to type the next character
-        function typeNextChar() {
-            // If we've finished all lines
-            if (lineIndex >= paragraphs.length) {
-                cursor.remove(); // Remove cursor when done
-                return;
-            }
-            
-            const currentLine = paragraphs[lineIndex];
-            const spans = currentLine.querySelectorAll('span');
-            
-            // If we've finished the current line
-            if (charIndex >= spans.length) {
-                lineIndex++;
-                charIndex = 0;
+        // Animation step function
+        function revealNextChar() {
+            if (currentIndex < allSpans.length) {
+                // Make the current character visible
+                allSpans[currentIndex].classList.add('visible');
                 
-                // Position cursor at beginning of next line
-                if (lineIndex < paragraphs.length) {
-                    const nextLine = paragraphs[lineIndex];
-                    nextLine.parentNode.insertBefore(cursor, nextLine.nextSibling);
-                    setTimeout(typeNextChar, speed * 3); // Slightly longer pause between lines
+                // Position the cursor after the current character
+                const currentChar = allSpans[currentIndex];
+                
+                // Get the current element's position
+                const charRect = currentChar.getBoundingClientRect();
+                const containerRect = targetElement.getBoundingClientRect();
+                
+                // Update cursor position (we use absolute positioning inside the parent container)
+                cursor.style.position = 'absolute';
+                cursor.style.left = (charRect.right - containerRect.left + 2) + 'px';
+                cursor.style.top = (charRect.top - containerRect.top) + 'px';
+                
+                // Determine speed based on character type
+                let speed = 30; // Base speed in ms
+                
+                // Slow down at punctuation
+                const currentChar_text = currentChar.textContent;
+                if (['.', '!', '?', ',', ';', ':'].includes(currentChar_text)) {
+                    speed = currentChar_text === '.' || 
+                            currentChar_text === '!' || 
+                            currentChar_text === '?' ? 350 : 150;
                 }
-                return;
+                
+                // Pause briefly at the end of paragraphs
+                if (currentChar.parentElement.tagName === 'P' && 
+                    currentChar === currentChar.parentElement.lastChild) {
+                    speed = 500;
+                }
+                
+                currentIndex++;
+                setTimeout(revealNextChar, speed);
+            } else {
+                // Animation complete, keep cursor at end
+                cursor.style.animation = 'none';
+                setTimeout(() => {
+                    cursor.remove();
+                }, 1000);
             }
-            
-            // Make the next character visible
-            spans[charIndex].classList.add('visible');
-            
-            // Position cursor after the character
-            spans[charIndex].parentNode.insertBefore(cursor, spans[charIndex].nextSibling);
-            
-            // Move to next character
-            charIndex++;
-            
-            // Schedule next character
-            setTimeout(typeNextChar, speed);
         }
         
         // Start the animation
-        setTimeout(typeNextChar, speed);
+        setTimeout(revealNextChar, 500); // Small initial delay
     }
     </script>
 </body>
