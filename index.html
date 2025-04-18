@@ -192,63 +192,77 @@
         // Create a cursor element
         const cursor = document.createElement('span');
         cursor.className = 'typing-cursor';
-        targetElement.appendChild(cursor); // Attach to target element
+        targetElement.appendChild(cursor);
         
-        // Process text with proper paragraph breaks
+        // Process text into paragraphs
         const paragraphs = text.split('\n').filter(p => p.trim() !== '');
-        let allHTML = '';
+        let allParagraphs = [];
         
+        // Create paragraph elements
         paragraphs.forEach(paragraph => {
             if (paragraph.trim() !== '') {
-                allHTML += `<p>${paragraph.split('').map(char => 
-                    `<span>${char}</span>`).join('')}</p>`;
+                const p = document.createElement('p');
+                // Split paragraph into words
+                const words = paragraph.split(' ');
+                
+                // Add each word as a span
+                words.forEach(word => {
+                    const wordSpan = document.createElement('span');
+                    wordSpan.className = 'word';
+                    wordSpan.textContent = word + ' ';
+                    wordSpan.style.opacity = '0';
+                    p.appendChild(wordSpan);
+                });
+                
+                targetElement.appendChild(p);
+                allParagraphs.push(p);
             }
         });
         
-        targetElement.innerHTML = allHTML;
         targetElement.appendChild(cursor);
         
-        const allSpans = targetElement.querySelectorAll('span');
+        // Get all word spans
+        const allWords = targetElement.querySelectorAll('.word');
         let currentIndex = 0;
         
+        // Choose reveal mode ('word' or 'batch')
+        const revealMode = 'word'; // Change to 'batch' for faster but still animated appearance
+        const batchSize = 5; // Number of characters to reveal at once if using batch mode
+        
         // Animation step function
-        function revealNextChar() {
-            if (currentIndex < allSpans.length) {
-                // Make the current character visible
-                allSpans[currentIndex].classList.add('visible');
+        function revealNextWord() {
+            if (currentIndex < allWords.length) {
+                const currentWord = allWords[currentIndex];
                 
-                // Position the cursor after the current character
-                const currentChar = allSpans[currentIndex];
+                // Make the current word visible
+                currentWord.style.opacity = '1';
                 
-                // Get the current element's position
-                const charRect = currentChar.getBoundingClientRect();
+                // Position the cursor after the current word
+                const wordRect = currentWord.getBoundingClientRect();
                 const containerRect = targetElement.getBoundingClientRect();
                 
-                // Update cursor position (we use absolute positioning inside the parent container)
                 cursor.style.position = 'absolute';
-                cursor.style.left = (charRect.right - containerRect.left + 2) + 'px';
-                cursor.style.top = (charRect.top - containerRect.top) + 'px';
+                cursor.style.left = (wordRect.right - containerRect.left + 2) + 'px';
+                cursor.style.top = (wordRect.top - containerRect.top) + 'px';
                 
-                // Determine speed based on character type
-                let baseSpeed = 0.1; // Change this value to adjust overall speed (lower = faster)
-                let speed = baseSpeed; // Base speed in ms
-
+                // Determine speed based on word content
+                let speed = 10; // Ultra-fast base speed
+                
                 // Slow down at punctuation
-                const currentChar_text = currentChar.textContent;
-                if (['.', '!', '?', ',', ';', ':'].includes(currentChar_text)) {
-                    speed = currentChar_text === '.' || 
-                            currentChar_text === '!' || 
-                            currentChar_text === '?' ? baseSpeed * 11.7 : baseSpeed * 5;
+                const lastChar = currentWord.textContent.trim().slice(-1);
+                if (['.', '!', '?'].includes(lastChar)) {
+                    speed = 100; // Slightly longer pause at end of sentences
+                } else if ([',', ';', ':'].includes(lastChar)) {
+                    speed = 50; // Brief pause at commas, etc.
                 }
-
+                
                 // Pause briefly at the end of paragraphs
-                if (currentChar.parentElement.tagName === 'P' && 
-                    currentChar === currentChar.parentElement.lastChild) {
-                    speed = baseSpeed * 16.7;
+                if (currentWord === currentWord.parentElement.lastChild) {
+                    speed = 200;
                 }
                 
                 currentIndex++;
-                setTimeout(revealNextChar, speed);
+                setTimeout(revealNextWord, speed);
             } else {
                 // Animation complete, keep cursor at end
                 cursor.style.animation = 'none';
@@ -258,8 +272,48 @@
             }
         }
         
-        // Start the animation
-        setTimeout(revealNextChar, 500); // Small initial delay
+        // Alternative: Batch character reveal
+        function revealCharacterBatch() {
+            // If we still have spans to reveal
+            if (targetElement.querySelectorAll('span:not(.visible)').length > 0) {
+                // Get the next batch of spans
+                const spans = targetElement.querySelectorAll('span:not(.visible)');
+                const batchEnd = Math.min(batchSize, spans.length);
+                
+                // Make batch visible
+                for (let i = 0; i < batchEnd; i++) {
+                    spans[i].classList.add('visible');
+                }
+                
+                // Position cursor after last revealed span
+                if (spans.length > 0) {
+                    const lastSpan = spans[batchEnd - 1];
+                    const spanRect = lastSpan.getBoundingClientRect();
+                    const containerRect = targetElement.getBoundingClientRect();
+                    
+                    cursor.style.position = 'absolute';
+                    cursor.style.left = (spanRect.right - containerRect.left + 2) + 'px';
+                    cursor.style.top = (spanRect.top - containerRect.top) + 'px';
+                }
+                
+                setTimeout(revealCharacterBatch, 1);  // Ultra-fast 1ms delay
+            } else {
+                // Animation complete
+                cursor.style.animation = 'none';
+                setTimeout(() => {
+                    cursor.remove();
+                }, 1000);
+            }
+        }
+        
+        // Start the animation based on chosen mode
+        setTimeout(() => {
+            if (revealMode === 'word') {
+                revealNextWord();
+            } else {
+                revealCharacterBatch();
+            }
+        }, 100); // Small initial delay
     }
     </script>
 </body>
