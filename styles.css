@@ -30,7 +30,7 @@ body {
     justify-content: center;
     align-items: center;
     min-height: 100vh;
-    padding: 20px;
+    padding: 30px;
     background: linear-gradient(135deg, #f6f7ff 0%, #e8eaff 100%);
     color: var(--text);
     line-height: 1.6;
@@ -41,12 +41,13 @@ body {
     padding: 40px;
     border-radius: 16px;
     box-shadow: var(--shadow);
-    max-width: 800px;
+    max-width: 850px;
     width: 100%;
     position: relative;
     overflow: hidden;
     transform: translateY(20px);
     animation: fadeIn 0.6s ease forwards;
+    margin: 20px auto;
 }
 
 @keyframes fadeIn {
@@ -87,14 +88,14 @@ form {
 }
 
 .form-group {
-    margin-bottom: 25px;
+    margin-bottom: 30px;
     position: relative;
     text-align: left;
 }
 
 label {
     display: block;
-    margin-bottom: 10px;
+    margin-bottom: 12px;
     font-weight: 600;
     color: var(--primary);
     transform: translateX(0);
@@ -126,6 +127,7 @@ input[type="file"] {
     text-align: center;
     cursor: pointer;
     transition: all 0.3s;
+    margin-bottom: 8px;
 }
 
 .file-input-container:hover {
@@ -160,6 +162,8 @@ input[type="file"] {
     font-size: 14px;
     color: var(--light-text);
     text-align: center;
+    padding: 0 10px;
+    word-break: break-word;
 }
 
 textarea {
@@ -174,6 +178,7 @@ textarea {
     resize: vertical;
     min-height: 120px;
     transition: all 0.3s;
+    margin-bottom: 5px;
 }
 
 textarea:focus {
@@ -198,6 +203,7 @@ button {
     transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     box-shadow: 0 4px 10px rgba(99, 102, 241, 0.25);
     letter-spacing: 0.5px;
+    margin-top: 15px;
 }
 
 button:hover {
@@ -249,8 +255,8 @@ button.clicking {
 
 /* Enhanced Result Styling */
 #result {
-    margin-top: 40px;
-    padding: 30px;
+    margin-top: 50px;
+    padding: 35px;
     border-radius: 12px;
     background-color: #fcfdff;
     border-left: 5px solid var(--secondary);
@@ -281,8 +287,8 @@ button.clicking {
 }
 
 .result-metadata {
-    margin-bottom: 20px;
-    padding: 12px 16px;
+    margin-bottom: 25px;
+    padding: 14px 18px;
     background-color: #f3f4f6;
     border-radius: 8px;
     font-size: 14px;
@@ -293,18 +299,19 @@ button.clicking {
 
 .result-label {
     font-weight: 600;
-    margin-right: 5px;
+    margin-right: 8px;
     color: var(--primary);
 }
 
 .result-content {
     position: relative;
     background: linear-gradient(to right, #ffffff, #f9fafb);
-    padding: 24px;
+    padding: 30px;
     border-radius: 10px;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
     border: 1px solid #eef2ff;
-    margin-bottom: 20px;
+    margin-bottom: 25px;
+    overflow: hidden;
 }
 
 /* Improved text output styling */
@@ -383,20 +390,20 @@ button.clicking {
 
 .result-actions {
     display: flex;
-    gap: 12px;
+    gap: 15px;
     justify-content: flex-end;
-    margin-top: 20px;
+    margin-top: 25px;
 }
 
 .result-actions button {
-    padding: 10px 16px;
+    padding: 12px 18px;
     background: white;
     color: var(--primary);
     border: 1px solid var(--primary);
     font-size: 14px;
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 8px;
 }
 
 .result-actions button:hover {
@@ -406,7 +413,7 @@ button.clicking {
 
 .loading {
     display: none;
-    margin: 20px auto;
+    margin: 30px auto;
     width: 48px;
     height: 48px;
     border: 4px solid rgba(99, 102, 241, 0.2);
@@ -430,7 +437,7 @@ button.clicking {
 /* Responsive adjustments */
 @media (max-width: 768px) {
     .container {
-        padding: 25px;
+        padding: 30px 20px;
     }
     
     h1 {
@@ -442,7 +449,11 @@ button.clicking {
     }
     
     #result {
-        padding: 20px;
+        padding: 25px 20px;
+    }
+    
+    .result-content {
+        padding: 20px 15px;
     }
 }
 
@@ -492,32 +503,35 @@ input:focus + .focus-border {
     }
 }
 
-/* Improved typing animation with better timing */
+/* Modified typing animation for letter-by-letter and line-by-line effect */
 .typing-animation {
-    display: inline-block;
-    overflow: hidden;
-    border-right: 3px solid var(--primary);
-    white-space: nowrap;
-    margin: 0;
-    letter-spacing: 0.02em;
-    animation: typing 4s steps(50, end) forwards, blink-caret 0.75s step-end infinite;
+    display: block;
+    white-space: normal;
+    position: relative;
+    line-height: 1.8;
 }
 
-@keyframes typing {
-    from { width: 0 }
-    to { width: 100% }
+.typing-animation span {
+    visibility: hidden;
+}
+
+.typing-animation span.visible {
+    visibility: visible;
+}
+
+.typing-cursor {
+    display: inline-block;
+    width: 3px;
+    height: 1.2em;
+    background-color: var(--primary);
+    margin-left: 2px;
+    vertical-align: middle;
+    animation: blink-caret 0.75s step-end infinite;
 }
 
 @keyframes blink-caret {
-    from, to { border-color: transparent }
-    50% { border-color: var(--primary) }
-}
-
-/* Make the animation work better with longer content */
-.typing-animation.complete {
-    white-space: pre-wrap;
-    border-right: none;
-    animation: none;
+    from, to { opacity: 0 }
+    50% { opacity: 1 }
 }
 
 .success {
@@ -536,30 +550,12 @@ input:focus + .focus-border {
     border-radius: 8px 8px 0 0;
 }
 
-/* Add gradient overlay to create depth */
-#outputText::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    height: 30px;
-    background: linear-gradient(to top, rgba(255,255,255,0.8), rgba(255,255,255,0));
-    pointer-events: none;
-    opacity: 0;
-    transition: opacity 0.3s;
-}
-
-.result-content:hover #outputText::after {
-    opacity: 1;
-}
-
 /* Key points highlight styling */
 .key-point {
     background-color: #f0f9ff;
     border-left: 3px solid #3b82f6;
     padding: 12px 15px;
-    margin: 15px 0;
+    margin: 20px 0;
     border-radius: 0 8px 8px 0;
     position: relative;
 }

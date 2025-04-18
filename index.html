@@ -183,22 +183,85 @@
         });
     });
 
-    function animateText(element, text, delay = 5) {
-        element.textContent = '';
-        let i = 0;
+    function animateText(element, text, speed = 30) {
+        // Clear the element
+        element.innerHTML = '';
         
-        function typeWriter() {
-            if (i < text.length) {
-                element.textContent += text.charAt(i);
-                i++;
-                setTimeout(typeWriter, delay);
-            } else {
-                element.classList.remove('typing-animation');
+        // Split text into lines/paragraphs
+        const lines = text.split('\n');
+        
+        // Create span elements for each character in each line
+        lines.forEach((line, lineIndex) => {
+            // Create a paragraph element for each line
+            const paragraph = document.createElement('p');
+            paragraph.classList.add('line');
+            
+            // Split into characters and create spans
+            line.split('').forEach(char => {
+                const span = document.createElement('span');
+                span.textContent = char;
+                paragraph.appendChild(span);
+            });
+            
+            // Add paragraph to the element
+            element.appendChild(paragraph);
+            
+            // If not the last line and the line isn't empty, add a line break
+            if (lineIndex < lines.length - 1 && line.trim() !== '') {
+                element.appendChild(document.createElement('br'));
             }
+        });
+        
+        // Add cursor element
+        const cursor = document.createElement('span');
+        cursor.classList.add('typing-cursor');
+        element.appendChild(cursor);
+        
+        // Animation variables
+        let lineIndex = 0;
+        let charIndex = 0;
+        const paragraphs = element.querySelectorAll('.line');
+        
+        // Function to type the next character
+        function typeNextChar() {
+            // If we've finished all lines
+            if (lineIndex >= paragraphs.length) {
+                cursor.remove(); // Remove cursor when done
+                return;
+            }
+            
+            const currentLine = paragraphs[lineIndex];
+            const spans = currentLine.querySelectorAll('span');
+            
+            // If we've finished the current line
+            if (charIndex >= spans.length) {
+                lineIndex++;
+                charIndex = 0;
+                
+                // Position cursor at beginning of next line
+                if (lineIndex < paragraphs.length) {
+                    const nextLine = paragraphs[lineIndex];
+                    nextLine.parentNode.insertBefore(cursor, nextLine.nextSibling);
+                    setTimeout(typeNextChar, speed * 3); // Slightly longer pause between lines
+                }
+                return;
+            }
+            
+            // Make the next character visible
+            spans[charIndex].classList.add('visible');
+            
+            // Position cursor after the character
+            spans[charIndex].parentNode.insertBefore(cursor, spans[charIndex].nextSibling);
+            
+            // Move to next character
+            charIndex++;
+            
+            // Schedule next character
+            setTimeout(typeNextChar, speed);
         }
         
-        element.classList.add('typing-animation');
-        typeWriter();
+        // Start the animation
+        setTimeout(typeNextChar, speed);
     }
     </script>
 </body>
