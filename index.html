@@ -230,20 +230,21 @@
                 cursor.style.top = (charRect.top - containerRect.top) + 'px';
                 
                 // Determine speed based on character type
-                let speed = 30; // Base speed in ms
-                
+                let baseSpeed = 3; // Change this value to adjust overall speed (lower = faster)
+                let speed = baseSpeed; // Base speed in ms
+
                 // Slow down at punctuation
                 const currentChar_text = currentChar.textContent;
                 if (['.', '!', '?', ',', ';', ':'].includes(currentChar_text)) {
                     speed = currentChar_text === '.' || 
                             currentChar_text === '!' || 
-                            currentChar_text === '?' ? 350 : 150;
+                            currentChar_text === '?' ? baseSpeed * 11.7 : baseSpeed * 5;
                 }
-                
+
                 // Pause briefly at the end of paragraphs
                 if (currentChar.parentElement.tagName === 'P' && 
                     currentChar === currentChar.parentElement.lastChild) {
-                    speed = 500;
+                    speed = baseSpeed * 16.7;
                 }
                 
                 currentIndex++;
