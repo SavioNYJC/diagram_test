@@ -38,7 +38,18 @@
 
         <div id="result">
             <h2><i class="fas fa-lightbulb"></i> Analysis Results</h2>
-            <p id="outputText"></p>
+            <!-- You can add more structure here -->
+            <div class="result-metadata">
+                <span class="result-label">Image:</span> <span id="resultFileName"></span>
+            </div>
+            <div class="result-content">
+                <p id="outputText"></p>
+            </div>
+            <!-- Maybe add buttons for actions -->
+            <div class="result-actions">
+                <button id="copyResults"><i class="fas fa-copy"></i> Copy</button>
+                <button id="saveResults"><i class="fas fa-save"></i> Save</button>
+            </div>
         </div>
     </div>
 
@@ -50,6 +61,16 @@
         const loading = document.getElementById('loading');
         const result = document.getElementById('result');
         const outputText = document.getElementById('outputText');
+        document.getElementById('resultFileName').textContent = resultData.filename;    
+        outputText.textContent = resultData.response;
+
+        document.getElementById('copyResults').addEventListener('click', function() {
+            navigator.clipboard.writeText(outputText.textContent);
+            this.innerHTML = '<i class="fas fa-check"></i> Copied!';
+            setTimeout(() => {
+                this.innerHTML = '<i class="fas fa-copy"></i> Copy';
+            }, 2000);
+        });
         
         // Show file name when selected
         imageInput.addEventListener('change', function() {
@@ -69,6 +90,11 @@
         form.addEventListener('submit', async function(e) {
             e.preventDefault();
             
+            submitBtn.classList.add('clicking');
+            setTimeout(() => {
+                submitBtn.classList.remove('clicking');
+            }, 400);
+
             const submitBtn = document.getElementById('submitBtn');
             const formData = new FormData();
             formData.append("image", imageInput.files[0]);
@@ -101,6 +127,7 @@
                 outputText.textContent = resultData.response || `Received: ${resultData.message} - ${resultData.prompt}`;
                 result.classList.add('active');
                 result.classList.add('success');
+                animateText(outputText, resultData.response);
                 
                 // Reset form state
                 submitBtn.disabled = false;
@@ -131,6 +158,25 @@
             this.parentElement.querySelector('.focus-border').style.width = '0';
         });
     });
+
+    function animateText(element, text, speed = 30) {
+        element.textContent = '';
+        let i = 0;
+        
+        function typeWriter() {
+            if (i < text.length) {
+                element.textContent += text.charAt(i);
+                i++;
+                setTimeout(typeWriter, speed);
+            } else {
+                element.classList.remove('typing-animation');
+            }
+        }
+        
+        element.classList.add('typing-animation');
+        typeWriter();
+    }
+
     </script>
 </body>
 </html>

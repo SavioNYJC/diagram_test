@@ -188,7 +188,7 @@ button {
     position: relative;
     overflow: hidden;
     font-family: inherit;
-    transition: all 0.3s;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     box-shadow: 0 4px 6px rgba(99, 102, 241, 0.25);
 }
 
@@ -219,6 +219,11 @@ button:focus:not(:active)::after {
     animation: ripple 1s ease-out;
 }
 
+button.clicking {
+    animation: buttonClick 0.4s forwards;
+    background: linear-gradient(90deg, var(--primary-hover), var(--primary));
+}
+
 @keyframes ripple {
     0% {
         transform: scale(0, 0);
@@ -241,13 +246,16 @@ button:focus:not(:active)::after {
     background-color: #f8fafc;
     border-left: 4px solid var(--secondary);
     opacity: 0;
+    max-height: 0;
+    overflow: hidden;
     transform: translateY(20px);
-    transition: all 0.5s ease;
+    transition: all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
 #result.active {
     opacity: 1;
-    transform: translateY(0);
+    max-height: 800px; /* Adjust based on expected content length */
+    transform: translateY(0);       
 }
 
 #result h2 {
@@ -279,6 +287,12 @@ button:focus:not(:active)::after {
     to {
         transform: rotate(360deg);
     }
+}
+
+@keyframes buttonClick {
+    0% { transform: scale(1); }
+    50% { transform: scale(0.95); }
+    100% { transform: scale(1); }
 }
 
 /* Responsive adjustments */
@@ -340,6 +354,23 @@ input:focus + .focus-border {
     100% {
         box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
     }
+}
+
+.typing-animation {
+    overflow: hidden;
+    white-space: nowrap;
+    border-right: 2px solid var(--primary);
+    animation: typing 3.5s steps(40, end), blink-caret 0.75s step-end infinite;
+}
+
+@keyframes typing {
+    from { width: 0 }
+    to { width: 100% }
+}
+
+@keyframes blink-caret {
+    from, to { border-color: transparent }
+    50% { border-color: var(--primary) }
 }
 
 .success {
