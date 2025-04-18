@@ -38,14 +38,12 @@
 
         <div id="result">
             <h2><i class="fas fa-lightbulb"></i> Analysis Results</h2>
-            <!-- You can add more structure here -->
             <div class="result-metadata">
                 <span class="result-label">Image:</span> <span id="resultFileName"></span>
             </div>
             <div class="result-content">
                 <p id="outputText"></p>
             </div>
-            <!-- Maybe add buttons for actions -->
             <div class="result-actions">
                 <button id="copyResults"><i class="fas fa-copy"></i> Copy</button>
                 <button id="saveResults"><i class="fas fa-save"></i> Save</button>
@@ -61,41 +59,34 @@
         const loading = document.getElementById('loading');
         const result = document.getElementById('result');
         const outputText = document.getElementById('outputText');
-        document.getElementById('resultFileName').textContent = resultData.filename;    
-        outputText.textContent = resultData.response;
-
-        document.getElementById('copyResults').addEventListener('click', function() {
-            navigator.clipboard.writeText(outputText.textContent);
-            this.innerHTML = '<i class="fas fa-check"></i> Copied!';
-            setTimeout(() => {
-                this.innerHTML = '<i class="fas fa-copy"></i> Copy';
-            }, 2000);
-        });
+        const resultFileName = document.getElementById('resultFileName');
+        const submitBtn = document.getElementById('submitBtn');
+        
+        // Initialize with empty results
+        result.style.display = 'none';
         
         // Show file name when selected
         imageInput.addEventListener('change', function() {
             if (this.files && this.files[0]) {
                 fileName.textContent = this.files[0].name;
-                
-                // Preview image if needed
-                // const reader = new FileReader();
-                // reader.onload = function(e) {
-                //     imagePreview.src = e.target.result;
-                //     imagePreviewContainer.style.display = 'block';
-                // }
-                // reader.readAsDataURL(this.files[0]);
             }
         });
 
         form.addEventListener('submit', async function(e) {
             e.preventDefault();
             
+            // Animation for button click
             submitBtn.classList.add('clicking');
             setTimeout(() => {
                 submitBtn.classList.remove('clicking');
             }, 400);
 
-            const submitBtn = document.getElementById('submitBtn');
+            // Validate form
+            if (!imageInput.files || !imageInput.files[0]) {
+                alert("Please select an image file");
+                return;
+            }
+
             const formData = new FormData();
             formData.append("image", imageInput.files[0]);
             formData.append("prompt", document.getElementById("prompt").value);
@@ -105,6 +96,7 @@
             submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
             loading.style.display = 'block';
             result.classList.remove('active');
+            result.style.display = 'none';
             form.classList.add('uploading');
             
             try {
@@ -123,11 +115,15 @@
 
                 const resultData = await response.json();
                 
+                // Update the result file name
+                resultFileName.textContent = imageInput.files[0].name;
+                
                 // Display the result with animation
+                result.style.display = 'block';
                 outputText.textContent = resultData.response || `Received: ${resultData.message} - ${resultData.prompt}`;
                 result.classList.add('active');
                 result.classList.add('success');
-                animateText(outputText, resultData.response);
+                animateText(outputText, resultData.response || `Received: ${resultData.message} - ${resultData.prompt}`);
                 
                 // Reset form state
                 submitBtn.disabled = false;
@@ -139,6 +135,7 @@
             } catch (error) {
                 form.classList.remove('uploading');
                 loading.style.display = 'none';
+                result.style.display = 'block';
                 outputText.textContent = `Error: ${error.message}`;
                 result.classList.add('active');
                 
@@ -156,6 +153,33 @@
         
         textarea.addEventListener('blur', function() {
             this.parentElement.querySelector('.focus-border').style.width = '0';
+        });
+
+        // Copy results functionality
+        document.getElementById('copyResults').addEventListener('click', function() {
+            navigator.clipboard.writeText(outputText.textContent);
+            this.innerHTML = '<i class="fas fa-check"></i> Copied!';
+            setTimeout(() => {
+                this.innerHTML = '<i class="fas fa-copy"></i> Copy';
+            }, 2000);
+        });
+
+        // Save results functionality
+        document.getElementById('saveResults').addEventListener('click', function() {
+            const blob = new Blob([outputText.textContent], {type: 'text/plain'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'analysis-results.txt';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            this.innerHTML = '<i class="fas fa-check"></i> Saved!';
+            setTimeout(() => {
+                this.innerHTML = '<i class="fas fa-save"></i> Save';
+            }, 2000);
         });
     });
 
@@ -176,7 +200,6 @@
         element.classList.add('typing-animation');
         typeWriter();
     }
-
     </script>
 </body>
 </html>
