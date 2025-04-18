@@ -9,8 +9,7 @@ client = OpenAI(
 )
 
 app = Flask(__name__)
-CORS(app)
-
+CORS(app, resources={r"/process": {"origins": "*"}})
 def encode_image(image_path):
     with open(image_path, "rb") as image_file:
         return base64.b64encode(image_file.read()).decode("utf-8")
@@ -63,7 +62,7 @@ def process():
         max_tokens = 500,  
     )
 
-    output_text = response.choices[0].text.strip()
+    output_text = response.choices[0].message.content.strip()
 
     return jsonify({
         'message': 'Success!',
@@ -71,6 +70,3 @@ def process():
         'prompt': text_input,
         'response': output_text
     })
-
-if __name__ == "__main__":
-    app.run(debug=True, host="0.0.0.0", port=5000)
