@@ -2,6 +2,7 @@ import os
 import base64
 from openai import OpenAI
 from flask import Flask, render_template, request, jsonify
+from flask_cors import CORS
 
 client = OpenAI(
     api_key = os.environ['OPENAI_API_KEY']
@@ -66,3 +67,6 @@ def process():
     return jsonify({
         "message": output_text,
     })
+
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=5000)  # Flask runs by default on port 5000
