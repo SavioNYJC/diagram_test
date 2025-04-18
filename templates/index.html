@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OpenAI Image and Text Input</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Upload an Image and Provide a Prompt</h1>
+        <form action="/process" method="POST" enctype="multipart/form-data">
+            <label for="image">Select Image:</label>
+            <input type="file" name="image" id="image" accept="image/*" required>
+
+            <label for="prompt">Enter Text Prompt:</label>
+            <textarea name="prompt" id="prompt" placeholder="Enter your text prompt here..." required></textarea>
+
+            <button type="submit">Submit</button>
+        </form>
+
+        <!-- This will show the result once the image and text are processed -->
+        <div id="result">
+            <h2>Output:</h2>
+            <p id="outputText"></p>
+        </div>
+    </div>
+</body>
+</html>
