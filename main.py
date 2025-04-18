@@ -19,7 +19,7 @@ def encode_image(image_path):
 def index():
     return render_template('index.html')
 
-@app.route('/process', methods=['POST'])
+@app.route("/process", methods=["POST"])
 def process():
     #Gets the relative (subject to change) image path. Include a better system in website in the future. (deprecated)
     #image_path = 'test_chart2.jpeg'
