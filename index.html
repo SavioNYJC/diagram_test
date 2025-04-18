@@ -183,7 +183,7 @@
         });
     });
 
-    function animateText(element, text, speed = 120) {
+    function animateText(element, text, delay = 5) {
         element.textContent = '';
         let i = 0;
         
@@ -191,7 +191,7 @@
             if (i < text.length) {
                 element.textContent += text.charAt(i);
                 i++;
-                setTimeout(typeWriter, speed);
+                setTimeout(typeWriter, delay);
             } else {
                 element.classList.remove('typing-animation');
             }
