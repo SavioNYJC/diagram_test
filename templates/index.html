@@ -34,7 +34,7 @@
         formData.append("prompt", document.getElementById("prompt").value);
 
         // Send the data to the Flask backend
-        const response = await fetch("http://<your-codespace-name>--5000.githubpreview.dev/process", {
+        const response = await fetch("http://diagram_test--5000.githubpreview.dev/process", {
             method: "POST",
             body: formData
         });
