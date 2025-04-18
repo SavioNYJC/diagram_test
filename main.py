@@ -2,7 +2,7 @@ import os
 import base64
 from openai import OpenAI
 from flask import Flask, render_template, request, jsonify
-from flask_cors import CORS
+from flask_cors import CORS, cross_origin
 
 client = OpenAI(
     api_key = os.environ['OPENAI_API_KEY']
