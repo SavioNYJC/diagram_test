@@ -28,11 +28,11 @@ def process():
     image = request.files['image']
     text_input = request.form['prompt']
 
-    if not image or not prompt:
+    if not image or not text_input:
         return jsonify({"error": "Missing image or prompt"}), 400
 
     #Encode the image into base64
-    base64_image = encode_image(image)
+    base64_image = base64.b64encode(image.read()).decode("utf-8")
 
     #Gets the text prompt. Adds some parameters to the prompt.
     text_prompt = text_input + "Please provide a response that explains the graph in a straightforward manner, using only text and avoiding any formatting."
@@ -63,12 +63,13 @@ def process():
         max_tokens = 500,  
     )
 
-    output_text = resposne.choices[0].text.strip()
+    output_text = response.choices[0].text.strip()
 
     return jsonify({
         'message': 'Success!',
         'filename': image.filename,
-        'prompt': prompt
+        'prompt': text_input,
+        'response': output_text
     })
 
 if __name__ == "__main__":
