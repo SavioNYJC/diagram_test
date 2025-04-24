@@ -39,7 +39,7 @@ def process():
         base64_image = base64.b64encode(image_data).decode("utf-8")
 
         # Build the prompt with additional instructions
-        text_prompt = text_input + " Please provide a response that explains the graph in a straightforward manner, using only text and avoiding any formatting."
+        text_prompt = text_input + " Please provide a response that describes the graph in a straightforward manner, using only text and avoiding any formatting.The result should describe the image in such a way that an image generation ai can generate a similar image with the result"
 
         # Send the API request to OpenAI
         try:
